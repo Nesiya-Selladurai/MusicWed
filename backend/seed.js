@@ -119,9 +119,19 @@ const songsData = [
   }
 ];
 
-export const seedData = async () => {
+export const seedData = async ({ force = false } = {}) => {
   try {
-    await Song.deleteMany();
+    const existingCount = await Song.countDocuments();
+    if (existingCount > 0 && !force) {
+      console.log(`Seed skipped: database already contains ${existingCount} song(s).`);
+      return;
+    }
+
+    if (force) {
+      await Song.deleteMany();
+      console.log('Existing data cleared.');
+    }
+
     await Song.insertMany(songsData);
     console.log('Final stabilization of database complete!');
   } catch (error) {
