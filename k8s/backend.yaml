@@ -18,6 +18,7 @@ spec:
         image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/music-app-backend:latest
         ports:
         - containerPort: 5000
+          hostPort: 5000
         resources:
           limits:
             cpu: "500m"
