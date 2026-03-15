@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '../api.js';
 import SongCard from '../components/SongCard';
 
 const Home = () => {
@@ -10,7 +10,7 @@ const Home = () => {
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/songs');
+        const { data } = await api.get('/api/songs');
         setSongs(data);
         setLoading(false);
       } catch (error) {

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useRef, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '../api.js';
 
 const MusicContext = createContext();
 
@@ -78,7 +78,7 @@ export const MusicProvider = ({ children }) => {
     try {
       const headers = getAuthHeader();
       if (!headers.Authorization) return;
-      const { data } = await axios.get('http://localhost:5000/api/users/me', { headers });
+      const { data } = await api.get('/api/users/me', { headers });
       setLikedSongs(data.likedSongs || []);
       setPlaylists(data.playlists || []);
     } catch (error) {
@@ -187,7 +187,7 @@ export const MusicProvider = ({ children }) => {
 
   const toggleLike = async (songId) => {
     try {
-      const { data } = await axios.post(`http://localhost:5000/api/users/me/like/${songId}`, {}, {
+      const { data } = await api.post(`/api/users/me/like/${songId}`, {}, {
         headers: getAuthHeader()
       });
       setLikedSongs(data);
@@ -198,7 +198,7 @@ export const MusicProvider = ({ children }) => {
 
   const createPlaylist = async (name, songs = []) => {
     try {
-      const { data } = await axios.post(`http://localhost:5000/api/users/me/playlists`, { name, songs }, {
+      const { data } = await api.post(`/api/users/me/playlists`, { name, songs }, {
         headers: getAuthHeader()
       });
       setPlaylists([...playlists, data]);

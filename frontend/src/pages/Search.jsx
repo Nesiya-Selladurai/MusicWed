@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '../api.js';
 import { Search as SearchIcon, ChevronLeft } from 'lucide-react';
 import SongCard from '../components/SongCard';
 
@@ -21,7 +21,7 @@ const Search = () => {
       setLoading(true);
       setSelectedGenre(null); // Clear selected genre when searching
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/search?q=${query}`);
+        const { data } = await api.get(`/api/search?q=${query}`);
         setSongs(data);
         setLoading(false);
       } catch (error) {
@@ -41,7 +41,7 @@ const Search = () => {
     setSelectedGenre(genre);
     setFetchingGenre(true);
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/songs/genre/${genre}`);
+      const { data } = await api.get(`/api/songs/genre/${genre}`);
       setGenreSongs(data);
     } catch (error) {
       console.error('Error fetching genre songs', error);
