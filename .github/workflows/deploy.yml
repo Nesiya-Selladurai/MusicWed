@@ -20,12 +20,19 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Set lower case owner name
+      id: prep
+      run: |
+        echo "OWNER_LC=${OWNER,,}" >> $GITHUB_OUTPUT
+      env:
+        OWNER: '${{ github.repository_owner }}'
+
     - name: Build and push backend image
       uses: docker/build-push-action@v4
       with:
         context: ./backend
         push: true
-        tags: ghcr.io/${{ github.repository_owner }}/music-app-backend:latest
+        tags: ghcr.io/${{ steps.prep.outputs.OWNER_LC }}/music-app-backend:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -51,7 +58,8 @@ jobs:
             --dry-run=client -o yaml | kubectl apply -f -
           
           # Replace placeholder with actual repository owner in manifest
-          sed -i "s/\${GITHUB_REPOSITORY_OWNER}/${{ github.repository_owner }}/g" k8s/backend.yaml
+          export OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          sed -i "s/\${GITHUB_REPOSITORY_OWNER}/${OWNER_LC}/g" k8s/backend.yaml
           
           kubectl apply -f k8s/
           # Force rollout restart to pick up new image
