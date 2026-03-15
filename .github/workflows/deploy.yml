@@ -50,7 +50,7 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ~/MusicWed
-          git pull origin main
+          git pull origin master
           # Create secrets if they don't exist
           kubectl create secret generic music-app-secrets \
             --from-literal=MONGO_URI="${{ secrets.MONGO_URI }}" \
