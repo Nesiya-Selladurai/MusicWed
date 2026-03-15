@@ -68,6 +68,9 @@ jobs:
           sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
           sudo chown $(id -u):$(id -g) ~/.kube/config
 
+          # Ensure kubectl uses the local kubeconfig (avoid reading /etc/rancher/k3s/k3s.yaml)
+          export KUBECONFIG="$HOME/.kube/config"
+
           # Create secrets if they don't exist
           kubectl create secret generic music-app-secrets \
             --from-literal=MONGO_URI="${{ secrets.MONGODB_URI }}" \
