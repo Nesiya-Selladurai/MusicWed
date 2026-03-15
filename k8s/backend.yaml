@@ -36,6 +36,10 @@ spec:
             secretKeyRef:
               name: music-app-secrets
               key: JWT_SECRET
+        - name: SEED_DB
+          value: "true"
+        - name: SEED_FORCE
+          value: "true"
 ---
 apiVersion: v1
 kind: Service
@@ -82,10 +86,9 @@ kind: Service
 metadata:
   name: frontend-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: frontend
   ports:
     - port: 80
       targetPort: 80
-      nodePort: 30080

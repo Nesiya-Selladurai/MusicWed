@@ -88,9 +88,13 @@ jobs:
           export OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           sed -i "s/\${GITHUB_REPOSITORY_OWNER}/${OWNER_LC}/g" k8s/backend.yaml
 
+          # Delete previous deployments/services so everything is recreated cleanly
+          kubectl delete -f k8s/ --ignore-not-found
+
           kubectl apply -f k8s/
           # Force rollout restart to pick up new image
           kubectl rollout restart deployment backend
+          kubectl rollout restart deployment frontend
 
           # Clean up so the next run starts from a fresh clone
           cd "$HOME"

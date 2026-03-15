@@ -13,9 +13,12 @@ connectDB();
 
 // Optional: auto-seed the database when the server starts (set SEED_DB=true)
 if (process.env.SEED_DB === 'true') {
-  import('./seed.js').then(({ seedData }) => seedData()).catch((err) => {
-    console.error('Error during auto-seed:', err);
-  });
+  const forceSeed = process.env.SEED_FORCE === 'true';
+  import('./seed.js')
+    .then(({ seedData }) => seedData({ force: forceSeed }))
+    .catch((err) => {
+      console.error('Error during auto-seed:', err);
+    });
 }
 
 const app = express();
