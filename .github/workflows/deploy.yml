@@ -53,7 +53,7 @@ jobs:
           git pull origin master
           # Create secrets if they don't exist
           kubectl create secret generic music-app-secrets \
-            --from-literal=MONGO_URI="${{ secrets.MONGO_URI }}" \
+            --from-literal=MONGO_URI="${{ secrets.MONGODB_URI }}" \
             --from-literal=JWT_SECRET="${{ secrets.JWT_SECRET }}" \
             --dry-run=client -o yaml | kubectl apply -f -
           
