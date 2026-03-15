@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { GoogleLogin } from '@react-oauth/google';
 import { Music, User, Mail, Lock, Loader2 } from 'lucide-react';
 
 const Signup = () => {
@@ -10,7 +9,7 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { register, googleLogin } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -22,18 +21,6 @@ const Signup = () => {
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to register');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSuccess = async (credentialResponse) => {
-    setLoading(true);
-    try {
-      await googleLogin(credentialResponse.credential);
-      navigate('/');
-    } catch (err) {
-      setError('Google signup failed');
     } finally {
       setLoading(false);
     }
@@ -110,25 +97,6 @@ const Signup = () => {
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create Account'}
           </button>
         </form>
-
-        <div className="relative my-8">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/10"></div>
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-[#18181b] px-2 text-gray-500">Or continue with</span>
-          </div>
-        </div>
-
-        <div className="flex justify-center">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => setError('Google signup failed')}
-            theme="filled_black"
-            shape="pill"
-            width="100%"
-          />
-        </div>
 
         <p className="text-center mt-8 text-gray-400 text-sm">
           Already have an account?{' '}

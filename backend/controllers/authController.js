@@ -1,9 +1,6 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { OAuth2Client } from 'google-auth-library';
-
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'secret123', {
@@ -71,46 +68,3 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// @desc    Google login
-// @route   POST /api/auth/google
-export const googleLogin = async (req, res) => {
-  const { idToken } = req.body;
-
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const { name, email, picture, sub } = ticket.getPayload();
-
-    let user = await User.findOne({ email });
-
-    if (user) {
-      // Update googleId if not present
-      if (!user.googleId) {
-        user.googleId = sub;
-        user.avatar = picture;
-        await user.save();
-      }
-    } else {
-      user = await User.create({
-        username: name,
-        email,
-        googleId: sub,
-        avatar: picture,
-      });
-    }
-
-    res.json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      avatar: user.avatar,
-      token: generateToken(user._id),
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(401).json({ message: 'Google authentication failed' });
-  }
-};
