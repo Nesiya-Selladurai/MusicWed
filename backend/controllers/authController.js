@@ -8,6 +8,12 @@ const generateToken = (id) => {
   });
 };
 
+export const loginInfo = (req, res) => {
+  res.status(405).json({
+    message: 'Use POST /api/auth/login with { email, password } in the body to log in.',
+  });
+};
+
 // @desc    Register a new user
 export const registerUser = async (req, res) => {
   try {
