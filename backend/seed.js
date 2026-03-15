@@ -4,7 +4,6 @@ import connectDB from './config/db.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
-connectDB();
 
 const songsData = [
   // TAMIL SONGS (UPDATED WITH RELIABLE IMAGES)
@@ -120,16 +119,19 @@ const songsData = [
   }
 ];
 
-const seedData = async () => {
+export const seedData = async () => {
   try {
     await Song.deleteMany();
     await Song.insertMany(songsData);
     console.log('Final stabilization of database complete!');
-    process.exit();
   } catch (error) {
     console.error('Error seeding data:', error);
-    process.exit(1);
+    throw error;
   }
 };
 
-seedData();
+if (import.meta.url === `file://${process.argv[1]}`) {
+  connectDB().then(() => {
+    seedData().then(() => process.exit(0)).catch(() => process.exit(1));
+  });
+}

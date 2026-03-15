@@ -11,6 +11,13 @@ dotenv.config();
 
 connectDB();
 
+// Optional: auto-seed the database when the server starts (set SEED_DB=true)
+if (process.env.SEED_DB === 'true') {
+  import('./seed.js').then(({ seedData }) => seedData()).catch((err) => {
+    console.error('Error during auto-seed:', err);
+  });
+}
+
 const app = express();
 
 // Prometheus monitoring setup
