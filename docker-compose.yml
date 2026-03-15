@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  backend:
+    image: ${DOCKER_HUB_USERNAME}/music-app-backend:latest
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=${MONGO_URI:-mongodb://cloud-mongodb-placeholder}
+      - JWT_SECRET=${JWT_SECRET:-secret-placeholder}
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    restart: always

@@ -1,0 +1,58 @@
+name: Build and Deploy to K3s
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Login to GHCR
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push backend image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./backend
+        push: true
+        tags: ghcr.io/${{ github.repository_owner }}/music-app-backend:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Deploy to K3s
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd ~/MusicWed
+          git pull origin main
+          # Create secrets if they don't exist
+          kubectl create secret generic music-app-secrets \
+            --from-literal=MONGO_URI="${{ secrets.MONGO_URI }}" \
+            --from-literal=JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Replace placeholder with actual repository owner in manifest
+          sed -i "s/\${GITHUB_REPOSITORY_OWNER}/${{ github.repository_owner }}/g" k8s/backend.yaml
+          
+          kubectl apply -f k8s/
+          # Force rollout restart to pick up new image
+          kubectl rollout restart deployment backend

@@ -5,12 +5,22 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import musicRoutes from './routes/musicRoutes.js';
 import morgan from 'morgan';
+import client from 'prom-client';
 
 dotenv.config();
 
 connectDB();
 
 const app = express();
+
+// Prometheus monitoring setup
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics({ register: client.register });
+
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
+});
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
