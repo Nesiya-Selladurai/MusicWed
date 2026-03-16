@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const songsData = [
-  // TAMIL SONGS (UPDATED WITH RELIABLE IMAGES)
+
   {
     title: 'Why This Kolaveri Di',
     artist: 'Anirudh Ravichander',
