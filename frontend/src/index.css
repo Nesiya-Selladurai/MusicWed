@@ -25,7 +25,7 @@
     scrollbar-width: none;
   }
 
-  /* Custom scrollbar for some areas */
+  
   .custom-scrollbar::-webkit-scrollbar {
     width: 8px;
   }
